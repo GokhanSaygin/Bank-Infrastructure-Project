@@ -43,8 +43,7 @@ resource "aws_db_instance" "main" {
   multi_az = false
 
   # Backup (FREE TIER: 7 days retention)
-  backup_retention_period = 7
-  backup_window           = "03:00-04:00"
+  backup_retention_period = 0
   maintenance_window      = "Mon:04:00-Mon:05:00"
 
   # Snapshots
