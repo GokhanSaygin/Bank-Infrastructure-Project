@@ -3,7 +3,7 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = {
     Name        = "${var.environment}-bank-vpc"
     Environment = var.environment
@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
 # Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = {
     Name        = "${var.environment}-igw"
     Environment = var.environment
@@ -27,7 +27,7 @@ resource "aws_subnet" "public" {
   cidr_block              = var.public_subnet_cidr
   map_public_ip_on_launch = true
   availability_zone       = "us-east-1a"
-  
+
   tags = {
     Name        = "${var.environment}-public-subnet-1a"
     Environment = var.environment
@@ -41,7 +41,7 @@ resource "aws_subnet" "public_2" {
   cidr_block              = var.public_subnet_2_cidr
   map_public_ip_on_launch = true
   availability_zone       = "us-east-1b"
-  
+
   tags = {
     Name        = "${var.environment}-public-subnet-1b"
     Environment = var.environment
@@ -54,7 +54,7 @@ resource "aws_subnet" "private_app_1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_app_subnet_1_cidr
   availability_zone = "us-east-1a"
-  
+
   tags = {
     Name        = "${var.environment}-private-app-subnet-1a"
     Environment = var.environment
@@ -67,7 +67,7 @@ resource "aws_subnet" "private_app_2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_app_subnet_2_cidr
   availability_zone = "us-east-1b"
-  
+
   tags = {
     Name        = "${var.environment}-private-app-subnet-1b"
     Environment = var.environment
@@ -80,7 +80,7 @@ resource "aws_subnet" "private_db_1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_db_subnet_1_cidr
   availability_zone = "us-east-1a"
-  
+
   tags = {
     Name        = "${var.environment}-private-db-subnet-1a"
     Environment = var.environment
@@ -93,7 +93,7 @@ resource "aws_subnet" "private_db_2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.private_db_subnet_2_cidr
   availability_zone = "us-east-1b"
-  
+
   tags = {
     Name        = "${var.environment}-private-db-subnet-1b"
     Environment = var.environment
@@ -104,12 +104,12 @@ resource "aws_subnet" "private_db_2" {
 # Route Table - Public
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  
+
   tags = {
     Name        = "${var.environment}-public-rt"
     Environment = var.environment
@@ -119,7 +119,7 @@ resource "aws_route_table" "public" {
 # Route Table - Private (NAT Gateway olmadan)
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = {
     Name        = "${var.environment}-private-rt"
     Environment = var.environment
@@ -168,7 +168,7 @@ resource "aws_flow_log" "main" {
   log_destination = aws_cloudwatch_log_group.vpc_flow_log.arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.main.id
-  
+
   tags = {
     Name        = "${var.environment}-vpc-flow-logs"
     Environment = var.environment
@@ -179,7 +179,7 @@ resource "aws_flow_log" "main" {
 resource "aws_cloudwatch_log_group" "vpc_flow_log" {
   name              = "/aws/vpc/${var.environment}-bank-vpc"
   retention_in_days = 7
-  
+
   tags = {
     Name        = "${var.environment}-vpc-flow-logs"
     Environment = var.environment
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_log_group" "vpc_flow_log" {
 # IAM Role for VPC Flow Logs
 resource "aws_iam_role" "vpc_flow_log" {
   name = "${var.environment}-vpc-flow-log-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -202,7 +202,7 @@ resource "aws_iam_role" "vpc_flow_log" {
       }
     ]
   })
-  
+
   tags = {
     Name        = "${var.environment}-vpc-flow-log-role"
     Environment = var.environment
@@ -213,7 +213,7 @@ resource "aws_iam_role" "vpc_flow_log" {
 resource "aws_iam_role_policy" "vpc_flow_log" {
   name = "${var.environment}-vpc-flow-log-policy"
   role = aws_iam_role.vpc_flow_log.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
