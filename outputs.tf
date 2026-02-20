@@ -41,3 +41,23 @@ output "environment" {
   description = "Environment name"
   value       = var.environment
 }
+
+
+# Monitoring Outputs
+output "cloudwatch_dashboard_url" {
+  description = "CloudWatch Dashboard URL"
+  value       = "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}"
+}
+
+output "sns_topic_arn" {
+  description = "SNS Topic ARN for alerts"
+  value       = aws_sns_topic.alerts.arn
+}
+
+output "alarms" {
+  description = "CloudWatch Alarm names"
+  value = {
+    high_cpu     = aws_cloudwatch_metric_alarm.high_cpu.alarm_name
+    status_check = aws_cloudwatch_metric_alarm.instance_status_check.alarm_name
+  }
+}
